@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch with Gradient Half Circle</title>
+    <style>
+        /* General styling for body */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Half-circle gradient styling */
+        .half-circle {
+            width: 200px;
+            height: 100px;
+            background: linear-gradient(90deg, #ffcc00 0%, #ff6600 100%);
+            border-top-left-radius: 100px;
+            border-top-right-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        /* Stopwatch container */
+        .stopwatch {
+            text-align: center;
+        }
+
+        /* Stopwatch display */
+        .time {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+
+        /* Buttons styling */
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        /* Lap times list */
+        .laps {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .laps li {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Half Circle Gradient -->
+    <div class="half-circle"></div>
+
+    <!-- Stopwatch UI -->
+    <div class="stopwatch">
+        <div class="time" id="display">00:00:00</div>
+
+        <!-- Buttons for controlling the stopwatch -->
+        <button id="startPauseBtn">Start</button>
+        <button id="resetBtn">Reset</button>
+        <button id="lapBtn">Lap</button>
+
+        <!-- Lap Times Display -->
+        <ul class="laps" id="laps"></ul>
+    </div>
+
+    <script>
+        let timer;
+        let isRunning = false;
+        let startTime = 0;
+        let elapsedTime = 0;
+        let lapTimes = [];
+
+        const display = document.getElementById('display');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const lapBtn = document.getElementById('lapBtn');
+        const laps = document.getElementById('laps');
+
+        // Function to start/pause the stopwatch
+        function startPause() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                startPauseBtn.textContent = 'Start';
+            } else {
+                startTime = Date.now() - elapsedTime;
+                timer = setInterval(updateTime, 100);
+                isRunning = true;
+                startPauseBtn.textContent = 'Pause';
+            }
+        }
+
+        // Function to reset the stopwatch
+        function reset() {
+            clearInterval(timer);
+            isRunning = false;
+            elapsedTime = 0;
+            lapTimes = [];
+            updateTime();
+            startPauseBtn.textContent = 'Start';
+            laps.innerHTML = '';
+        }
+
+        // Function to record lap times
+        function lap() {
+            if (isRunning) {
+                const currentLapTime = formatTime(elapsedTime);
+                lapTimes.push(currentLapTime);
+                const lapItem = document.createElement('li');
+                lapItem.textContent = `Lap ${lapTimes.length}: ${currentLapTime}`;
+                laps.appendChild(lapItem);
+            }
+        }
+
+        // Function to update the displayed time
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            display.textContent = formatTime(elapsedTime);
+        }
+
+        // Function to format time into minutes, seconds, milliseconds
+        function formatTime(time) {
+            const milliseconds = Math.floor((time % 1000) / 100);
+            const seconds = Math.floor((time / 1000) % 60);
+            const minutes = Math.floor((time / (1000 * 60)) % 60);
+            return `${pad(minutes)}:${pad(seconds)}:${pad(milliseconds)}`;
+        }
+
+        // Function to pad time values with leading zeros
+        function pad(value) {
+            return value.toString().padStart(2, '0');
+        }
+
+        // Event listeners for buttons
+        startPauseBtn.addEventListener('click', startPause);
+        resetBtn.addEventListener('click', reset);
+        lapBtn.addEventListener('click', lap);
+    </script>
+</body>
+</html>
